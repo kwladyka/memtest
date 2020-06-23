@@ -10,7 +10,7 @@
             [org.httpkit.server :as httpkit]))
 
 (def resources
-  {:not-found (constantly (ring-response/not-found "try103"))})
+  {:not-found (constantly (ring-response/not-found (System/getenv "K_REVISION")))})
 
 (def handler
   (bidi/make-handler ["/" {true :not-found}] resources))
