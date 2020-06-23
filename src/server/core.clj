@@ -2,7 +2,7 @@
   (:require [integrant.core :as ig]
             [bidi.ring :as bidi]
             [ring.util.response :as ring-response]
-            [ring.middleware
+            #_[ring.middleware <--
              [params :refer [wrap-params]]
              [format :refer [wrap-restful-format]]
              [keyword-params :refer [wrap-keyword-params]]
@@ -10,12 +10,12 @@
             [org.httpkit.server :as httpkit]))
 
 (def resources
-  {:not-found (constantly (ring-response/not-found "try103"))})
+  {:not-found (constantly (ring-response/not-found (System/getenv "K_REVISION")))})
 
 (def handler
   (bidi/make-handler ["/" {true :not-found}] resources))
 
-(def app-stateless
+#_(def app-stateless <--
   (-> handler
       (wrap-keyword-params {:parse-namespaces? true})
       (wrap-json-body {:keywords? true :bigdecimals? true})
@@ -27,7 +27,7 @@
          (remove (comp nil? val) config)))
 
 (defmethod ig/init-key ::server [_ opts]
-  (httpkit/run-server app-stateless opts))
+  (httpkit/run-server handler opts))
 
 (defmethod ig/halt-key! ::server [_ server]
   (when server
