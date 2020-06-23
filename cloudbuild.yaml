@@ -1,0 +1,16 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'eu.gcr.io/$PROJECT_ID/$REPO_NAME:$SHORT_SHA', '.']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'eu.gcr.io/$PROJECT_ID/$REPO_NAME']
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: ['run', 'deploy', '$REPO_NAME',
+           '--image', 'eu.gcr.io/$PROJECT_ID/$REPO_NAME:$SHORT_SHA',
+           '--revision-suffix', '$SHORT_SHA',
+           '--region', 'europe-west1',
+           '--max-instances', '3',
+           '--cpu', '1',
+           '--memory', '128Mi',
+           '--port', '80',
+           '--platform', 'managed',
+           '--allow-unauthenticated']
